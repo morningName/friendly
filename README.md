@@ -67,11 +67,11 @@ What if you could just type what you want to do?
   git rewind 1 commit
   ^ Undo my last commit. Makes sense!
 
-  docker show all containers
-  ^ Show all containers. Easy to understand!
+  docker terminal myapp
+  ^ Open a terminal in my container. Easy!
 
-  npm add lodash --dev
-  ^ Add lodash as a dev dependency. Clear!
+  npm install lodash --dev
+  ^ Install lodash as a dev dependency. Clear!
 ```
 
 That's what Friendly Terminal does.
@@ -137,21 +137,22 @@ See that `Running:` line? That's the real command. **You learn while you use it.
 ```bash
 # Git
 git show changes              # → git status
-git show diff                 # → git diff
+git save "message"            # → git add . && git commit -m "message"
 git sync upload               # → git push
-git sync download             # → git pull
-git rewind 1 commit           # → git reset --soft HEAD~1
-git create my-feature         # → git checkout -b my-feature
+git draft                     # → git stash (save work-in-progress)
+git rehome main               # → git rebase main
+git create tag v1.0.0         # → git tag v1.0.0
 
 # NPM
-npm setup                     # → npm install
-npm add lodash                # → npm install lodash
-npm add jest --dev            # → npm install jest --save-dev
+npm install                   # → npm install (all dependencies)
+npm install lodash            # → npm install lodash
+npm install jest --dev        # → npm install jest --save-dev
 
 # Docker
 docker show containers        # → docker ps
-docker show all containers    # → docker ps -a
-docker show logs myapp        # → docker logs myapp
+docker terminal myapp         # → docker exec -it myapp bash
+docker connect myapp          # → docker exec -it myapp bash
+docker compose up detach      # → docker-compose up -d
 ```
 
 ---
@@ -253,11 +254,20 @@ Friendly Terminal works with these tools:
 | Tool | Description | Example |
 |------|-------------|---------|
 | **git** | Version control — track changes, collaborate | `git show changes`, `git save "msg"` |
-| **npm** | Node.js packages — install libraries, run scripts | `npm setup`, `npm add lodash` |
+| **npm** | Node.js packages — install libraries, run scripts | `npm install`, `npm install lodash` |
+| **java** | Java development — compile, run, JAR, classpath | `java compile App.java`, `java run App` |
 | **gradle** | Java/Android builds — build and run apps | `gradle build`, `gradle run` |
 | **maven** | Java builds — another way to build Java projects | `maven build`, `maven test` |
-| **docker** | Containers — run apps in isolated environments | `docker show containers` |
-| **files** | File operations — search and view files | `files find "text"` |
+| **docker** | Containers — run apps in isolated environments | `docker terminal myapp`, `docker compose up` |
+| **files** | File operations — search and view files | `files find text "hello"`, `files list` |
+
+**Linux/Server Tools:**
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| **shell** | Shell scripting — environment, cron, aliases | `shell show path`, `shell edit bashrc` |
+| **server** | Web servers — nginx, apache, SSL, reverse proxy | `server nginx status`, `server ssl get certificate` |
+| **system** | Linux admin — apt, systemctl, firewall, users | `system install nginx`, `system firewall allow 80` |
 
 ---
 
@@ -312,16 +322,53 @@ git merge my-feature
 
 ```bash
 # Install dependencies
-npm setup
+npm install
 
 # Add packages
-npm add axios
-npm add jest --dev
+npm install axios
+npm install jest --dev
 
 # Run scripts
 npm run start
 npm run test
 ```
+
+---
+
+## Custom Commands — Create Your Own Shortcuts
+
+Don't see a command you need? Create your own!
+
+```bash
+friendly custom <package> "<friendly command>" : "<actual command>"
+```
+
+**Examples:**
+
+```bash
+# Create a new package with shortcuts
+friendly custom deploy "push" : "git push origin main && npm run build"
+# Now use: friendly deploy push
+
+# Extend existing tools
+friendly custom npm "quick test" : "npm run test -- --watch"
+# Now use: friendly npm quick test
+
+# Create git shortcuts
+friendly custom git "yolo" : "git add . && git commit -m 'update' && git push"
+# Now use: friendly git yolo
+```
+
+**Managing Custom Commands:**
+
+```bash
+friendly custom list                    # See all custom commands
+friendly custom remove <pkg> "<cmd>"    # Remove a command
+friendly custom edit                    # Edit config file directly
+friendly custom clear                   # Remove all custom commands
+```
+
+Custom commands are checked **before** built-in commands, so you can even override existing ones!
 
 ---
 
@@ -336,10 +383,14 @@ friendly-terminal/
 │   ├── commands/             # Tool implementations
 │   │   ├── git.js            #   Git commands (50+ commands)
 │   │   ├── npm.js            #   NPM commands
-│   │   ├── docker.js         #   Docker commands
+│   │   ├── java.js           #   Java compile, run, JAR commands
+│   │   ├── docker.js         #   Docker commands (60+ commands)
 │   │   ├── gradle.js         #   Gradle commands
 │   │   ├── maven.js          #   Maven commands
-│   │   └── files.js          #   File operations
+│   │   ├── files.js          #   File operations (cross-platform)
+│   │   ├── shell.js          #   Shell scripting commands
+│   │   ├── server.js         #   Nginx, Apache, SSL commands
+│   │   └── system.js         #   Linux system admin commands
 │   │
 │   ├── utils/
 │   │   ├── ascii.js          #   Logo, messages
@@ -348,7 +399,8 @@ friendly-terminal/
 │   ├── index.js              # Main router
 │   ├── setup.js              # Shell integration
 │   ├── mode.js               # Mode switching
-│   └── tour.js               # Interactive tour
+│   ├── tour.js               # Interactive tour
+│   └── custom.js             # Custom commands feature
 │
 ├── COMMANDS.md               # Full command reference
 └── CORE_VERBS.md             # Verb consistency guide

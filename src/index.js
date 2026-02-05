@@ -3,11 +3,16 @@ const { executeNpm, printNpmHelp } = require('./commands/npm');
 const { executeDocker, printDockerHelp } = require('./commands/docker');
 const { executeGradle, printGradleHelp } = require('./commands/gradle');
 const { executeMaven, printMavenHelp } = require('./commands/maven');
+const { executeJava, printJavaHelp } = require('./commands/java');
 const { executeFiles, printFilesHelp } = require('./commands/files');
+const { executeShell, printShellHelp } = require('./commands/shell');
+const { executeServer, printServerHelp } = require('./commands/server');
+const { executeSystem, printSystemHelp } = require('./commands/system');
 const { printLogo, printWelcome } = require('./utils/ascii');
 const { printTable, printSimpleTable } = require('./utils/table');
 const { handleMode, getMode } = require('./mode');
 const { runTour, runQuickTour } = require('./tour');
+const { handleCustom, runCustomCommand, hasCustomCommand, hasCustomPackage, getCustomPackages, printCustomPackageHelp } = require('./custom');
 const chalk = require('chalk');
 
 function showMainHelp() {
@@ -30,10 +35,16 @@ function showMainHelp() {
   console.log(chalk.hex('#8B5CF6')('  Supported Tools:\n'));
   console.log('    ' + chalk.green('git') + '      ' + chalk.white('Track changes, save work, collaborate with your team'));
   console.log('    ' + chalk.green('npm') + '      ' + chalk.white('Install packages, manage dependencies, run scripts'));
+  console.log('    ' + chalk.green('java') + '     ' + chalk.white('Compile, run, and manage Java applications'));
   console.log('    ' + chalk.green('gradle') + '   ' + chalk.white('Build and run Java/Android projects'));
   console.log('    ' + chalk.green('maven') + '    ' + chalk.white('Build, test, and package Java applications'));
   console.log('    ' + chalk.green('docker') + '   ' + chalk.white('Run apps in containers, manage images'));
   console.log('    ' + chalk.green('files') + '    ' + chalk.white('Search for files, find text in your project'));
+  console.log('');
+  console.log(chalk.hex('#8B5CF6')('  Linux/Server Tools:\n'));
+  console.log('    ' + chalk.green('shell') + '    ' + chalk.white('Shell scripting, environment variables, cron jobs'));
+  console.log('    ' + chalk.green('server') + '   ' + chalk.white('Nginx, Apache, reverse proxy, SSL certificates'));
+  console.log('    ' + chalk.green('system') + '   ' + chalk.white('apt packages, systemctl services, firewall, users'));
   console.log('');
 
   // Getting started
@@ -55,6 +66,17 @@ function showMainHelp() {
   console.log('    ' + chalk.green('friendly mode') + '              ' + chalk.white('Check which mode you\'re in'));
   console.log('    ' + chalk.green('friendly mode traditional') + '  ' + chalk.white('Switch to traditional commands'));
   console.log('    ' + chalk.green('friendly mode friendly') + '     ' + chalk.white('Switch back to friendly commands'));
+  console.log('');
+
+  // Custom commands
+  console.log(chalk.hex('#8B5CF6')('  Create Your Own Shortcuts:\n'));
+  console.log(chalk.white('    Don\'t see a command you need? Create your own!\n'));
+  console.log('    ' + chalk.green('friendly custom <package> "<command>" : "<actual>"'));
+  console.log('');
+  console.log(chalk.gray('    Examples:'));
+  console.log('    ' + chalk.green('friendly custom deploy "push" : "git push && npm run build"'));
+  console.log('    ' + chalk.green('friendly custom npm "quick test" : "npm run test --watch"'));
+  console.log('    ' + chalk.green('friendly custom list') + '       ' + chalk.white('See all your custom commands'));
   console.log('');
 
   // Quick examples
@@ -82,13 +104,17 @@ function showLearnMenu(tool) {
     console.log('  Available command references:\n');
 
     const learnOptions = [
+      { key: 'friendly learn all', value: 'Show everything' },
       { key: 'friendly learn git', value: 'Git version control' },
       { key: 'friendly learn npm', value: 'NPM package management' },
+      { key: 'friendly learn java', value: 'Java compile, run, JAR, classpath' },
       { key: 'friendly learn gradle', value: 'Gradle build tool' },
       { key: 'friendly learn maven', value: 'Maven build tool' },
       { key: 'friendly learn docker', value: 'Docker containers' },
       { key: 'friendly learn files', value: 'File operations' },
-      { key: 'friendly learn all', value: 'Show everything' },
+      { key: 'friendly learn shell', value: 'Shell scripting, cron, environment' },
+      { key: 'friendly learn server', value: 'Nginx, Apache, SSL, reverse proxy' },
+      { key: 'friendly learn system', value: 'Linux: apt, systemctl, firewall, users' },
     ];
 
     printSimpleTable(learnOptions);
@@ -111,6 +137,11 @@ function showLearnMenu(tool) {
       printNpmHelp();
       printLearnFooter();
       break;
+    case 'java':
+      printLearnHeader('Java', 'Compile, run, and manage Java applications');
+      printJavaHelp();
+      printLearnFooter();
+      break;
     case 'gradle':
       printLearnHeader('Gradle', 'Build tool for Java and Android projects');
       printGradleHelp();
@@ -131,6 +162,27 @@ function showLearnMenu(tool) {
       printFilesHelp();
       printLearnFooter();
       break;
+    case 'shell':
+    case 'bash':
+    case 'scripting':
+      printLearnHeader('Shell', 'Shell scripting, environment, and cron jobs');
+      printShellHelp();
+      printLearnFooter();
+      break;
+    case 'server':
+    case 'nginx':
+    case 'apache':
+      printLearnHeader('Server', 'Nginx, Apache, SSL, and reverse proxy');
+      printServerHelp();
+      printLearnFooter();
+      break;
+    case 'system':
+    case 'linux':
+    case 'ubuntu':
+      printLearnHeader('System', 'Linux administration: packages, services, firewall');
+      printSystemHelp();
+      printLearnFooter();
+      break;
     case 'all':
       printLearnHeader('All Commands', 'Complete reference for all tools');
       console.log(chalk.bold.yellow('\n  ═══════════════════════════════════════════════════════════'));
@@ -141,6 +193,10 @@ function showLearnMenu(tool) {
       console.log(chalk.bold.yellow('  NPM - Package Management'));
       console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
       printNpmHelp();
+      console.log(chalk.bold.yellow('\n  ═══════════════════════════════════════════════════════════'));
+      console.log(chalk.bold.yellow('  JAVA - Compile, Run, JAR, Classpath'));
+      console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
+      printJavaHelp();
       console.log(chalk.bold.yellow('\n  ═══════════════════════════════════════════════════════════'));
       console.log(chalk.bold.yellow('  GRADLE - Java/Android Build Tool'));
       console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
@@ -157,11 +213,23 @@ function showLearnMenu(tool) {
       console.log(chalk.bold.yellow('  FILES - File Operations'));
       console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
       printFilesHelp();
+      console.log(chalk.bold.yellow('\n  ═══════════════════════════════════════════════════════════'));
+      console.log(chalk.bold.yellow('  SHELL - Shell Scripting'));
+      console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
+      printShellHelp();
+      console.log(chalk.bold.yellow('\n  ═══════════════════════════════════════════════════════════'));
+      console.log(chalk.bold.yellow('  SERVER - Nginx, Apache, SSL'));
+      console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
+      printServerHelp();
+      console.log(chalk.bold.yellow('\n  ═══════════════════════════════════════════════════════════'));
+      console.log(chalk.bold.yellow('  SYSTEM - Linux Administration'));
+      console.log(chalk.bold.yellow('  ═══════════════════════════════════════════════════════════\n'));
+      printSystemHelp();
       printLearnFooter();
       break;
     default:
       console.log(`  Unknown tool: ${tool}`);
-      console.log('  Available: git, npm, gradle, maven, docker, files, all');
+      console.log('  Available: git, npm, gradle, maven, docker, files, shell, server, system, all');
   }
 }
 
@@ -191,25 +259,57 @@ function main(args) {
 
   const tool = args[0];
   const toolArgs = args.slice(1);
+  const friendlyCmd = toolArgs.join(' ');
+
+  // Helper to check and run custom command first
+  function tryCustomFirst(packageName, fallback) {
+    // Check if there's a custom command for this
+    if (friendlyCmd && hasCustomCommand(packageName, friendlyCmd)) {
+      runCustomCommand(packageName, friendlyCmd);
+    } else {
+      fallback();
+    }
+  }
 
   switch (tool) {
     case 'git':
-      executeGit(toolArgs);
+      tryCustomFirst('git', () => executeGit(toolArgs));
       break;
     case 'npm':
-      executeNpm(toolArgs);
+      tryCustomFirst('npm', () => executeNpm(toolArgs));
       break;
     case 'docker':
-      executeDocker(toolArgs);
+      tryCustomFirst('docker', () => executeDocker(toolArgs));
+      break;
+    case 'java':
+      tryCustomFirst('java', () => executeJava(toolArgs));
       break;
     case 'gradle':
-      executeGradle(toolArgs);
+      tryCustomFirst('gradle', () => executeGradle(toolArgs));
       break;
     case 'maven':
-      executeMaven(toolArgs);
+      tryCustomFirst('maven', () => executeMaven(toolArgs));
       break;
     case 'files':
-      executeFiles(toolArgs);
+      tryCustomFirst('files', () => executeFiles(toolArgs));
+      break;
+    case 'shell':
+    case 'bash':
+    case 'scripting':
+      tryCustomFirst('shell', () => executeShell(toolArgs));
+      break;
+    case 'server':
+    case 'nginx':
+    case 'apache':
+    case 'proxy':
+      tryCustomFirst('server', () => executeServer(toolArgs));
+      break;
+    case 'system':
+    case 'linux':
+    case 'ubuntu':
+    case 'apt':
+    case 'systemctl':
+      tryCustomFirst('system', () => executeSystem(toolArgs));
       break;
     case 'setup':
       require('./setup').runSetup();
@@ -233,9 +333,28 @@ function main(args) {
     case 'help':
       showMainHelp();
       break;
+    case 'custom':
+    case 'alias':
+    case 'shortcut':
+      handleCustom(toolArgs);
+      break;
     default:
+      // Check if it's a custom package
+      if (hasCustomPackage(tool)) {
+        if (friendlyCmd && hasCustomCommand(tool, friendlyCmd)) {
+          runCustomCommand(tool, friendlyCmd);
+        } else if (friendlyCmd === 'help' || friendlyCmd === '') {
+          printCustomPackageHelp(tool);
+        } else {
+          console.log(`Unknown command for ${tool}: ${friendlyCmd}`);
+          console.log(`Type "friendly ${tool} help" to see available commands.`);
+        }
+        return;
+      }
       console.log(`Unknown tool: ${tool}`);
-      console.log('Available tools: git, npm, docker, gradle, maven, files');
+      console.log('Available tools: git, npm, java, docker, gradle, maven, files, shell, server, system');
+      console.log('');
+      console.log('Or create your own: friendly custom add "shortcut" "command"');
       console.log('Type "friendly help" for more information.');
   }
 }

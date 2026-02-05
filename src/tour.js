@@ -46,8 +46,8 @@ async function runTour() {
   console.log(chalk.green('    ^ Undo my last commit. Makes sense!\n'));
   console.log(chalk.cyan('    docker show all containers'));
   console.log(chalk.green('    ^ Show all containers. Easy to understand!\n'));
-  console.log(chalk.cyan('    npm add lodash --dev'));
-  console.log(chalk.green('    ^ Add lodash as a dev dependency. Clear!\n'));
+  console.log(chalk.cyan('    npm install lodash --dev'));
+  console.log(chalk.green('    ^ Install lodash as a dev dependency. Clear!\n'));
   console.log('  That\'s what Friendly Terminal does.');
   console.log('  You type readable commands, we translate them for you.');
   console.log('');
@@ -181,17 +181,22 @@ async function runTour() {
   console.log(chalk.cyan('    npm      ') + chalk.gray('Node.js package manager'));
   console.log(chalk.gray('             Install libraries, run scripts'));
   console.log('');
-  console.log(chalk.cyan('    gradle   ') + chalk.gray('Java/Android build tool'));
-  console.log(chalk.gray('             Build and run Java/Android apps'));
-  console.log('');
-  console.log(chalk.cyan('    maven    ') + chalk.gray('Java build tool'));
-  console.log(chalk.gray('             Another way to build Java projects'));
+  console.log(chalk.cyan('    java     ') + chalk.gray('Java development'));
+  console.log(chalk.gray('             Compile, run, JAR, classpath'));
   console.log('');
   console.log(chalk.cyan('    docker   ') + chalk.gray('Container platform'));
-  console.log(chalk.gray('             Run apps in isolated containers'));
+  console.log(chalk.gray('             Run apps, connect to containers'));
   console.log('');
-  console.log(chalk.cyan('    files    ') + chalk.gray('File operations'));
-  console.log(chalk.gray('             Search and view files'));
+  console.log(chalk.cyan('    gradle   ') + chalk.gray('Java/Android build tool'));
+  console.log('');
+  console.log(chalk.cyan('    maven    ') + chalk.gray('Java build tool'));
+  console.log('');
+  console.log(chalk.cyan('    files    ') + chalk.gray('File operations (cross-platform)'));
+  console.log('');
+  console.log(chalk.bold('  Linux/Server:'));
+  console.log(chalk.cyan('    shell    ') + chalk.gray('Scripting, cron, environment'));
+  console.log(chalk.cyan('    server   ') + chalk.gray('Nginx, Apache, SSL'));
+  console.log(chalk.cyan('    system   ') + chalk.gray('apt, systemctl, firewall'));
   console.log('');
 
   await sleep(4000);
@@ -237,10 +242,11 @@ function runQuickTour() {
   console.log(chalk.bold.yellow('  WHAT IS THIS?\n'));
   console.log('  Type readable commands. We translate them for you.');
   console.log('  And we show you the real command, so you learn!\n');
-  console.log('    ' + chalk.cyan('git show changes') + '  →  ' + chalk.gray('git status'));
-  console.log('    ' + chalk.cyan('git save "msg"') + '    →  ' + chalk.gray('git add . && git commit -m "msg"'));
-  console.log('    ' + chalk.cyan('git sync upload') + '   →  ' + chalk.gray('git push'));
-  console.log('    ' + chalk.cyan('npm setup') + '         →  ' + chalk.gray('npm install'));
+  console.log('    ' + chalk.cyan('git show changes') + '     →  ' + chalk.gray('git status'));
+  console.log('    ' + chalk.cyan('git save "msg"') + '       →  ' + chalk.gray('git add . && git commit -m "msg"'));
+  console.log('    ' + chalk.cyan('git draft') + '            →  ' + chalk.gray('git stash (save work-in-progress)'));
+  console.log('    ' + chalk.cyan('docker terminal app') + '  →  ' + chalk.gray('docker exec -it app bash'));
+  console.log('    ' + chalk.cyan('npm install lodash') + '   →  ' + chalk.gray('npm install lodash'));
   console.log('');
 
   console.log(chalk.bold.yellow('  SEE ALL COMMANDS\n'));
@@ -262,10 +268,14 @@ function runQuickTour() {
   console.log(chalk.bold.yellow('  SUPPORTED TOOLS\n'));
   console.log('    ' + chalk.cyan('git') + '       Version control');
   console.log('    ' + chalk.cyan('npm') + '       Node.js packages');
+  console.log('    ' + chalk.cyan('java') + '      Compile, run, JAR');
+  console.log('    ' + chalk.cyan('docker') + '    Containers');
   console.log('    ' + chalk.cyan('gradle') + '    Java/Android builds');
   console.log('    ' + chalk.cyan('maven') + '     Java builds');
-  console.log('    ' + chalk.cyan('docker') + '    Containers');
-  console.log('    ' + chalk.cyan('files') + '     File search');
+  console.log('    ' + chalk.cyan('files') + '     File operations');
+  console.log('    ' + chalk.cyan('shell') + '     Scripting, cron');
+  console.log('    ' + chalk.cyan('server') + '    Nginx, Apache, SSL');
+  console.log('    ' + chalk.cyan('system') + '    Linux admin');
   console.log('');
 
   console.log(chalk.bold.yellow('  TRY NOW\n'));

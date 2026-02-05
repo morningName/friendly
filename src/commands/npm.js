@@ -4,7 +4,6 @@ const { printTable } = require('../utils/table');
 
 // NPM command mappings
 const npmCommands = {
-  'setup': { cmd: 'npm install', desc: 'Installs all project dependencies from package.json' },
   'show packages': { cmd: 'npm list --depth=0', desc: 'Shows all installed packages' },
   'show outdated': { cmd: 'npm outdated', desc: 'Shows packages that have newer versions' },
   'update': { cmd: 'npm update', desc: 'Updates all packages to latest allowed versions' },
@@ -17,14 +16,17 @@ const npmCommands = {
 
 // Commands that need arguments
 const npmCommandsWithArgs = {
-  'add': (pkg) => {
+  'install': (pkg) => {
+    if (!pkg || pkg.trim() === '') {
+      return { cmd: 'npm install', desc: 'Installs all project dependencies from package.json' };
+    }
     if (pkg.includes('--dev')) {
       const pkgName = pkg.replace('--dev', '').trim();
-      return { cmd: `npm install ${pkgName} --save-dev`, desc: `Adds ${pkgName} as a dev dependency` };
+      return { cmd: `npm install ${pkgName} --save-dev`, desc: `Installs ${pkgName} as a dev dependency` };
     }
-    return { cmd: `npm install ${pkg}`, desc: `Adds ${pkg} to your project` };
+    return { cmd: `npm install ${pkg}`, desc: `Installs ${pkg} to your project` };
   },
-  'remove': (pkg) => ({ cmd: `npm uninstall ${pkg}`, desc: `Removes ${pkg} from your project` }),
+  'uninstall': (pkg) => ({ cmd: `npm uninstall ${pkg}`, desc: `Uninstalls ${pkg} from your project` }),
   'run': (script) => ({ cmd: `npm run ${script}`, desc: `Runs the ${script} script` }),
 };
 
@@ -46,10 +48,8 @@ function executeNpm(args) {
   for (const [pattern, handler] of Object.entries(npmCommandsWithArgs)) {
     if (fullCommand.startsWith(pattern + ' ') || fullCommand === pattern) {
       const arg = fullCommand.slice(pattern.length).trim();
-      if (arg) {
-        const { cmd } = handler(arg);
-        return runCommand(cmd);
-      }
+      const { cmd } = handler(arg);
+      return runCommand(cmd);
     }
   }
 
@@ -78,13 +78,11 @@ function printNpmHelp() {
   const colWidths = [30, 35, 50];
 
   const rows = [
-    ['SETUP', '', ''],
-    ['npm setup', 'npm install', 'Installs all project dependencies from package.json'],
-    ['', '', ''],
-    ['PACKAGES', '', ''],
-    ['npm add <package>', 'npm install <package>', 'Adds a new package to your project'],
-    ['npm add <package> --dev', 'npm install <pkg> --save-dev', 'Adds a package as a dev dependency'],
-    ['npm remove <package>', 'npm uninstall <package>', 'Removes a package from your project'],
+    ['INSTALLING', '', ''],
+    ['npm install', 'npm install', 'Installs all project dependencies from package.json'],
+    ['npm install <package>', 'npm install <package>', 'Installs a new package to your project'],
+    ['npm install <package> --dev', 'npm install <pkg> --save-dev', 'Installs a package as a dev dependency'],
+    ['npm uninstall <package>', 'npm uninstall <package>', 'Uninstalls a package from your project'],
     ['npm show packages', 'npm list --depth=0', 'Shows all installed packages'],
     ['npm show outdated', 'npm outdated', 'Shows packages that have newer versions'],
     ['npm update', 'npm update', 'Updates all packages to latest allowed versions'],

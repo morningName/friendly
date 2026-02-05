@@ -41,7 +41,7 @@ git() {
 
   # In friendly mode, translate commands
   case "$1" in
-    show|save|commit|sync|rewind|discard|add|remove|stash|switch|create|delete|merge|rebase|tag|download|fetch|revert|cherry-pick|clean|config)
+    show|save|commit|sync|rewind|discard|add|remove|draft|switch|create|delete|merge|rehome|download|fetch|revert|cherry-pick|clean|config)
       friendly git "$@"
       ;;
     *)
@@ -65,11 +65,35 @@ npm() {
   fi
 
   case "$1" in
-    setup|add|remove|show|update|run)
+    install|uninstall|show|update|run)
       friendly npm "$@"
       ;;
     *)
       command npm "$@"
+      ;;
+  esac
+}
+
+# Java wrapper
+java() {
+  local mode=$(_friendly_mode)
+
+  if [ "$1" = "help" ]; then
+    friendly java help
+    return
+  fi
+
+  if [ "$mode" = "traditional" ]; then
+    command java "$@"
+    return
+  fi
+
+  case "$1" in
+    compile|run|create|extract|show|find)
+      friendly java "$@"
+      ;;
+    *)
+      command java "$@"
       ;;
   esac
 }
@@ -89,7 +113,7 @@ docker() {
   fi
 
   case "$1" in
-    show)
+    show|logs|follow|terminal|connect|shell|enter|run|start|stop|kill|restart|pause|resume|remove|delete|build|pull|push|inspect|ip|ports|top|stats|changes|copy|cleanup|compose|history|rename|diff)
       friendly docker "$@"
       ;;
     *)
@@ -136,6 +160,21 @@ maven() {
 files() {
   friendly files "$@"
 }
+
+# Shell scripting commands (Linux/macOS)
+shell() {
+  friendly shell "$@"
+}
+
+# Server commands - nginx, apache, ssl (Linux)
+server() {
+  friendly server "$@"
+}
+
+# System administration commands (Linux)
+system() {
+  friendly system "$@"
+}
 `;
 
 // PowerShell script
@@ -170,7 +209,7 @@ function git {
 
   # Friendly mode
   switch ($firstArg) {
-    {$_ -in 'show','save','commit','sync','rewind','discard','add','remove','stash','switch','create','delete','merge','rebase','tag','download','fetch','revert','cherry-pick','clean','config'} {
+    {$_ -in 'show','save','commit','sync','rewind','discard','add','remove','draft','switch','create','delete','merge','rehome','download','fetch','revert','cherry-pick','clean','config'} {
       & friendly git @args
     }
     default {
@@ -195,11 +234,36 @@ function npm {
   }
 
   switch ($firstArg) {
-    {$_ -in 'setup','add','remove','show','update','run'} {
+    {$_ -in 'install','uninstall','show','update','run'} {
       & friendly npm @args
     }
     default {
       & npm.cmd @args
+    }
+  }
+}
+
+function java {
+  param([Parameter(ValueFromRemainingArguments=$true)]$args)
+  $firstArg = $args[0]
+  $mode = Get-FriendlyMode
+
+  if ($firstArg -eq 'help') {
+    & friendly java help
+    return
+  }
+
+  if ($mode -eq 'traditional') {
+    & java.exe @args
+    return
+  }
+
+  switch ($firstArg) {
+    {$_ -in 'compile','run','create','extract','show','find'} {
+      & friendly java @args
+    }
+    default {
+      & java.exe @args
     }
   }
 }
@@ -218,10 +282,13 @@ function docker {
     return
   }
 
-  if ($args[0] -eq 'show') {
-    & friendly docker @args
-  } else {
-    & docker.exe @args
+  switch ($args[0]) {
+    {$_ -in 'show','logs','follow','terminal','connect','shell','enter','run','start','stop','kill','restart','pause','resume','remove','delete','build','pull','push','inspect','ip','ports','top','stats','changes','copy','cleanup','compose','history','rename','diff'} {
+      & friendly docker @args
+    }
+    default {
+      & docker.exe @args
+    }
   }
 }
 

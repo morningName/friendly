@@ -16,7 +16,7 @@ const gitCommands = {
   'show branches remote': { cmd: 'git branch -r', desc: 'Shows only remote branches' },
   'show remote': { cmd: 'git remote -v', desc: 'Shows remote repository URLs' },
   'show tags': { cmd: 'git tag', desc: 'Shows all tags' },
-  'show stash': { cmd: 'git stash list', desc: 'Shows all stashed changes' },
+  'show drafts': { cmd: 'git stash list', desc: 'Shows all saved drafts (stashed changes)' },
 
   // Syncing
   'sync upload': { cmd: 'git push', desc: 'Uploads your commits to the remote repository' },
@@ -36,19 +36,21 @@ const gitCommands = {
   'discard changes': { cmd: 'git checkout .', desc: 'Discards all uncommitted changes in files' },
   'discard all': { cmd: 'git reset --hard HEAD', desc: 'Discards ALL uncommitted changes (staged + unstaged)' },
 
-  // Stashing
-  'stash': { cmd: 'git stash', desc: 'Temporarily stores uncommitted changes' },
-  'stash apply': { cmd: 'git stash apply', desc: 'Restores stashed changes (keeps stash)' },
-  'stash pop': { cmd: 'git stash pop', desc: 'Restores stashed changes (removes stash)' },
-  'stash drop': { cmd: 'git stash drop', desc: 'Deletes the most recent stash' },
-  'stash clear': { cmd: 'git stash clear', desc: 'Deletes all stashes' },
+  // Drafts (Stashing) - Save work-in-progress without committing
+  'draft': { cmd: 'git stash', desc: 'Saves your uncommitted work as a draft so you can switch tasks' },
+  'draft save': { cmd: 'git stash', desc: 'Saves current changes as a draft to work on later' },
+  'draft restore': { cmd: 'git stash apply', desc: 'Brings back your draft changes (keeps the draft saved)' },
+  'draft restore and delete': { cmd: 'git stash pop', desc: 'Brings back your draft and removes it from drafts' },
+  'draft delete': { cmd: 'git stash drop', desc: 'Deletes the most recent draft' },
+  'draft delete all': { cmd: 'git stash clear', desc: 'Deletes all saved drafts' },
 
   // Branch shortcuts
   'switch -': { cmd: 'git checkout -', desc: 'Switches to the previous branch' },
 
-  // Rebase
-  'rebase cancel': { cmd: 'git rebase --abort', desc: 'Cancels an in-progress rebase' },
-  'rebase continue': { cmd: 'git rebase --continue', desc: 'Continues rebase after resolving conflicts' },
+  // Rehome (Rebase) - Move your commits to a new base
+  'rehome cancel': { cmd: 'git rebase --abort', desc: 'Cancels rehome and goes back to how things were before' },
+  'rehome continue': { cmd: 'git rebase --continue', desc: 'Continues rehome after you fixed the conflicts' },
+  'rehome skip': { cmd: 'git rebase --skip', desc: 'Skips the current commit and continues rehome' },
 
   // Undoing
   'revert last': { cmd: 'git revert HEAD', desc: 'Reverts the most recent commit' },
@@ -74,7 +76,7 @@ const gitCommandsWithArgs = {
 
   'rewind': (args) => parseRewindCommand(args),
 
-  'stash save': (msg) => ({ cmd: `git stash save "${msg}"`, desc: 'Stashes with a description' }),
+  'draft with message': (msg) => ({ cmd: `git stash save "${msg}"`, desc: 'Saves draft with a name so you can find it later' }),
 
   'switch': (branch) => ({ cmd: `git checkout ${branch}`, desc: `Switches to ${branch} branch` }),
   'create': (branch) => ({ cmd: `git checkout -b ${branch}`, desc: `Creates ${branch} branch and switches to it` }),
@@ -84,9 +86,10 @@ const gitCommandsWithArgs = {
   'rename branch': (name) => ({ cmd: `git branch -m ${name}`, desc: `Renames current branch to ${name}` }),
   'merge': (branch) => ({ cmd: `git merge ${branch}`, desc: `Merges ${branch} into current branch` }),
   'merge squash': (branch) => ({ cmd: `git merge --squash ${branch}`, desc: `Merges ${branch} as a single commit` }),
-  'rebase': (branch) => ({ cmd: `git rebase ${branch}`, desc: `Replays current branch commits onto ${branch}` }),
+  'rehome': (branch) => ({ cmd: `git rebase ${branch}`, desc: `Moves your commits on top of ${branch} (makes history cleaner)` }),
+  'rehome onto': (branch) => ({ cmd: `git rebase ${branch}`, desc: `Replays your work on top of ${branch}'s latest changes` }),
 
-  'tag': (tag) => ({ cmd: `git tag ${tag}`, desc: `Creates tag ${tag}` }),
+  'create tag': (tag) => ({ cmd: `git tag ${tag}`, desc: `Creates a bookmark named ${tag} at current commit` }),
   'delete tag': (tag) => ({ cmd: `git tag -d ${tag}`, desc: `Deletes local tag ${tag}` }),
   'delete remote tag': (tag) => ({ cmd: `git push origin --delete ${tag}`, desc: `Deletes tag ${tag} from remote` }),
 
@@ -214,7 +217,7 @@ function printGitHelp(topic) {
         ['git show blame <file>', 'git blame <file>', 'Shows who wrote each line of a file'],
         ['git show remote', 'git remote -v', 'Shows remote repository URLs'],
         ['git show tags', 'git tag', 'Shows all tags'],
-        ['git show stash', 'git stash list', 'Shows all stashed changes'],
+        ['git show drafts', 'git stash list', 'Shows all saved drafts'],
         ['git show commit <hash>', 'git show <hash>', 'Shows details of a specific commit'],
       ]
     },
@@ -262,15 +265,17 @@ function printGitHelp(topic) {
         ['git discard all', 'git reset --hard HEAD', 'Discards ALL uncommitted changes (staged + unstaged)'],
       ]
     },
-    stash: {
-      title: 'GIT STASH COMMANDS',
+    draft: {
+      title: 'GIT DRAFT COMMANDS (Save Work-in-Progress)',
       rows: [
-        ['git stash', 'git stash', 'Temporarily stores uncommitted changes'],
-        ['git stash save "message"', 'git stash save "message"', 'Stashes with a description'],
-        ['git stash apply', 'git stash apply', 'Restores stashed changes (keeps stash)'],
-        ['git stash pop', 'git stash pop', 'Restores stashed changes (removes stash)'],
-        ['git stash drop', 'git stash drop', 'Deletes the most recent stash'],
-        ['git stash clear', 'git stash clear', 'Deletes all stashes'],
+        ['git draft', 'git stash', 'Saves your uncommitted work as a draft'],
+        ['git draft save', 'git stash', 'Saves current changes to work on later'],
+        ['git draft with message "WIP"', 'git stash save "WIP"', 'Saves draft with a name to find it later'],
+        ['git draft restore', 'git stash apply', 'Brings back draft changes (keeps draft)'],
+        ['git draft restore and delete', 'git stash pop', 'Brings back draft and removes it'],
+        ['git draft delete', 'git stash drop', 'Deletes the most recent draft'],
+        ['git draft delete all', 'git stash clear', 'Deletes all saved drafts'],
+        ['git show drafts', 'git stash list', 'Shows all your saved drafts'],
       ]
     },
     branches: {
@@ -285,18 +290,21 @@ function printGitHelp(topic) {
         ['git rename branch <name>', 'git branch -m <name>', 'Renames the current branch'],
         ['git merge <branch>', 'git merge <branch>', 'Combines another branch into current branch'],
         ['git merge <branch> squash', 'git merge --squash <branch>', 'Merges as a single commit'],
-        ['git rebase <branch>', 'git rebase <branch>', 'Replays current branch commits onto another'],
-        ['git rebase cancel', 'git rebase --abort', 'Cancels an in-progress rebase'],
-        ['git rebase continue', 'git rebase --continue', 'Continues rebase after resolving conflicts'],
+        ['git rehome <branch>', 'git rebase <branch>', 'Moves your commits on top of another branch'],
+        ['git rehome cancel', 'git rebase --abort', 'Cancels rehome, goes back to before'],
+        ['git rehome continue', 'git rebase --continue', 'Continues after fixing conflicts'],
+        ['git rehome skip', 'git rebase --skip', 'Skips current commit, continues rehome'],
       ]
     },
     tags: {
-      title: 'GIT TAG COMMANDS',
+      title: 'GIT TAG COMMANDS (Bookmarks for Versions)',
       rows: [
-        ['git tag <name>', 'git tag <name>', 'Creates a lightweight tag'],
+        ['git create tag <name>', 'git tag <name>', 'Creates a bookmark at current commit'],
+        ['git create tag v1.0.0', 'git tag v1.0.0', 'Example: marks this as version 1.0.0'],
         ['git delete tag <name>', 'git tag -d <name>', 'Deletes a local tag'],
         ['git delete remote tag <name>', 'git push origin --delete <name>', 'Deletes a tag from remote'],
-        ['git show tags', 'git tag', 'Shows all tags'],
+        ['git show tags', 'git tag', 'Shows all tags/bookmarks'],
+        ['git sync upload tags', 'git push --tags', 'Uploads all tags to remote'],
       ]
     },
     remote: {
@@ -338,8 +346,8 @@ function printGitHelp(topic) {
     ['DISCARDING CHANGES', '', ''],
     ...helpData.discard.rows,
     ['', '', ''],
-    ['STASHING', '', ''],
-    ...helpData.stash.rows,
+    ['DRAFTS (Save Work-in-Progress)', '', ''],
+    ...helpData.draft.rows,
     ['', '', ''],
     ['BRANCHES', '', ''],
     ...helpData.branches.rows,
@@ -352,7 +360,7 @@ function printGitHelp(topic) {
   ], colWidths);
 
   console.log('');
-  console.log('  Type \'git help <topic>\' for details. Topics: show, save, sync, rewind, discard, stash, branches, tags, remote');
+  console.log('  Type \'git help <topic>\' for details. Topics: show, save, sync, rewind, discard, draft, branches, tags, remote');
   console.log('');
 }
 
