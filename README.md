@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/friendly-terminal/friendly-terminal/main/assets/logo.png" alt="Friendly Terminal" width="400">
+  <img src="https://raw.githubusercontent.com/morningName/friendly/main/assets/logo.png" alt="Friendly Terminal" width="400">
 </p>
 
 <h1 align="center">Friendly Terminal</h1>
@@ -24,19 +24,15 @@
   <a href="https://www.npmjs.com/package/friendly-terminal">
     <img src="https://img.shields.io/npm/dm/friendly-terminal.svg?style=flat-square" alt="npm downloads">
   </a>
-  <a href="https://github.com/friendly-terminal/friendly-terminal/blob/main/LICENSE">
+  <a href="https://github.com/morningName/friendly/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license">
   </a>
-  <a href="https://github.com/friendly-terminal/friendly-terminal/stargazers">
-    <img src="https://img.shields.io/github/stars/friendly-terminal/friendly-terminal?style=flat-square" alt="stars">
+  <a href="https://github.com/morningName/friendly/stargazers">
+    <img src="https://img.shields.io/github/stars/morningName/friendly?style=flat-square" alt="stars">
   </a>
 </p>
 
 <br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/friendly-terminal/friendly-terminal/main/assets/demo.gif" alt="Demo" width="600">
-</p>
 
 ---
 
@@ -450,7 +446,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ```bash
 # Clone and install
-git clone https://github.com/friendly-terminal/friendly-terminal.git
+git clone https://github.com/morningName/friendly.git
 cd friendly-terminal
 npm install
 
@@ -467,8 +463,8 @@ node bin/friendly.js git help
 ## Star History
 
 <p align="center">
-  <a href="https://star-history.com/#friendly-terminal/friendly-terminal&Date">
-    <img src="https://api.star-history.com/svg?repos=friendly-terminal/friendly-terminal&type=Date" alt="Star History">
+  <a href="https://star-history.com/#morningName/friendly&Date">
+    <img src="https://api.star-history.com/svg?repos=morningName/friendly&type=Date" alt="Star History">
   </a>
 </p>
 
@@ -477,8 +473,8 @@ node bin/friendly.js git help
 ## Contributors
 
 <p align="center">
-  <a href="https://github.com/friendly-terminal/friendly-terminal/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=friendly-terminal/friendly-terminal" alt="Contributors">
+  <a href="https://github.com/morningName/friendly/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=morningName/friendly" alt="Contributors">
   </a>
 </p>
 
@@ -500,6 +496,6 @@ node bin/friendly.js git help
 
 <p align="center">
   <a href="https://www.npmjs.com/package/friendly-terminal">npm</a> •
-  <a href="https://github.com/friendly-terminal/friendly-terminal">GitHub</a> •
-  <a href="https://github.com/friendly-terminal/friendly-terminal/issues">Issues</a>
+  <a href="https://github.com/morningName/friendly">GitHub</a> •
+  <a href="https://github.com/morningName/friendly/issues">Issues</a>
 </p>
