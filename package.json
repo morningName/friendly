@@ -1,0 +1,50 @@
+{
+  "name": "friendly-terminal",
+  "version": "1.0.0",
+  "description": "Human-readable commands for your terminal. Stop memorizing cryptic syntax.",
+  "main": "src/index.js",
+  "bin": {
+    "friendly": "./bin/friendly.js"
+  },
+  "scripts": {
+    "start": "node bin/friendly.js",
+    "tour": "node bin/friendly.js tour",
+    "test": "node bin/friendly.js git help"
+  },
+  "keywords": [
+    "terminal",
+    "cli",
+    "git",
+    "npm",
+    "docker",
+    "gradle",
+    "maven",
+    "friendly",
+    "human-readable",
+    "beginner-friendly",
+    "learning",
+    "cheatsheet",
+    "commands",
+    "shell",
+    "bash",
+    "zsh",
+    "powershell"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/friendly-terminal/friendly-terminal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/friendly-terminal/friendly-terminal/issues"
+  },
+  "homepage": "https://github.com/friendly-terminal/friendly-terminal#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6"
+  }
+}
