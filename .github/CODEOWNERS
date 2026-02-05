@@ -1,0 +1,18 @@
+# CODEOWNERS - Defines code owners for this repository
+# These owners will be automatically requested for review when PRs are opened
+
+# Global owner - reviews all changes
+* @morningName
+
+# Core application
+/src/ @morningName
+/bin/ @morningName
+
+# Documentation
+/README.md @morningName
+/COMMANDS.md @morningName
+/CONTRIBUTING.md @morningName
+
+# Configuration files
+/package.json @morningName
+/.github/ @morningName

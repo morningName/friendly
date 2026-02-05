@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/morningName/friendly/main/assets/logo.png" alt="Friendly Terminal" width="150">
+  <img src="./assets/logo.png" alt="Friendly Terminal" width="150">
 </p>
 
 <h1 align="center">Friendly Terminal</h1>
